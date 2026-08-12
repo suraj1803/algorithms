@@ -106,6 +106,44 @@ template <typename T> class BinaryNode {
         }
     }
 
+    void subTreeDelete() {
+        if (this->right) {
+            auto successor = this->successor();
+            swap(this->item, successor->item);
+            successor->subTreeDelete();
+        } else if (this->left) {
+            auto predecessor = this->predecessor();
+            swap(this->item, predecessor->item);
+            predecessor->subTreeDelete();
+        } else {
+            if (this->parent->left == this) {
+                this->parent->left = NULL;
+                free(this);
+            } else {
+                this->parent->right = NULL;
+                free(this);
+            }
+        }
+    }
+
+    void freeMemorySubtree() {
+
+        if (this->left)
+            this->left->freeMemorySubtree();
+
+        if (this->right)
+            this->right->freeMemorySubtree();
+
+        if (this->parent) {
+            if (this->parent->left == this) {
+                this->parent->left = NULL;
+            } else {
+                this->parent->right = NULL;
+            }
+        }
+        delete this;
+    }
+
     friend ostream &operator<<(ostream &out, const BinaryNode<T> &node) {
         out << node.item;
         return out;
@@ -128,6 +166,7 @@ int main(int argc, char *argv[]) {
     root->right = new BinaryNode<int>(15);
     root->right->parent = root;
     root->subTreeIter();
+
     // cout << root->subTreeFirst() << " " << root->subTreeLast() << endl;
     // cout << root->subTreeFirst() << endl;
     // cout << "successor of root : " << root->successor() << endl;
@@ -139,15 +178,15 @@ int main(int argc, char *argv[]) {
 
     auto node1 = new BinaryNode<int>(2);
     root->subTreeInsertAfter(node1);
-    root->subTreeIter();
-    cout << root->predecessor() << endl;
-    cout << root->successor() << endl;
 
-    free(root->left);
-    free(root->right);
-    free(root);
-    free(node);
-    free(node1);
+    auto node2 = new BinaryNode<int>(3);
+    root->subTreeInsertBefore(node2);
+    root->left->freeMemorySubtree();
+
+    // root->subTreeDelete();
+    root->subTreeIter();
+
+    root->freeMemorySubtree();
 
     return 0;
 }
