@@ -52,39 +52,53 @@ class BinaryNode {
             return this;
         }
 
+
+        /*
+         * the second case is to return the closest ancest for which 
+         * the given node comes to it's left subtree
+         */
+
         BinaryNode<T>* successor() {
             if (this->right) {
                 return this->right->subtreeFirst();
             }
 
             BinaryNode<T>* current = this;
-            while (current->parent && current->parent->left != current) {
+            while(current->parent != NULL && current->parent->right == current) {
                 current = current->parent;
             }
-        }
 
+            return current->parent;
+        }
 
 
         friend ostream& operator<<(ostream& out, const BinaryNode<T>& node) {
             out << node.item;
             return out;
         }
+
         friend ostream& operator<<(ostream& out, const BinaryNode<T> *node) {
-            out << node->item;
+            if(node == NULL)
+                out << "null";
+            else
+                out << node->item;
+
             return out;
         }
 
 };
 
 int main (int argc, char *argv[]) {
-    BinaryNode<int> root(10);
-    root.left = new BinaryNode<int>(5);
-    root.right = new BinaryNode<int>(15);
-    root.subtreeIter();
-    // cout << root.subtreeFirst() << " " << root.subtreeLast() << endl;
-    cout << root.subtreeFirst() << endl;
+    BinaryNode<int>* root = new BinaryNode<int>(10);
+    root->left = new BinaryNode<int>(5);
+    root->right = new BinaryNode<int>(15);
+    root->subtreeIter();
+    // cout << root->subtreeFirst() << " " << root->subtreeLast() << endl;
+    cout << root->subtreeFirst() << endl;
+    cout << "successor of root : " << root->successor() << endl;
 
-    free(root.left);
-    free(root.right);
+    free(root->left);
+    free(root->right);
+    free(root);
     return 0;
 }
