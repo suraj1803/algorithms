@@ -1,5 +1,7 @@
 #include <cstddef>
+#include <cstdio>
 #include <iostream>
+#include <vector>
 using namespace std;
 
 template <typename T> class BinaryNode {
@@ -159,34 +161,36 @@ template <typename T> class BinaryNode {
     }
 };
 
+BinaryNode<int> *buildTree(vector<int> &arr, int i, int j) {
+    if (i <= j) {
+        int root_index = (i + j) / 2;
+        BinaryNode<int> *root = new BinaryNode<int>(arr[root_index]);
+
+        BinaryNode<int> *left_node = buildTree(arr, i, root_index - 1);
+        BinaryNode<int> *right_node = buildTree(arr, root_index + 1, j);
+
+        root->left = left_node;
+        root->right = right_node;
+
+        if (left_node != NULL)
+            left_node->parent = root;
+        if (right_node != NULL)
+            right_node->parent = root;
+
+        return root;
+    } else {
+        return NULL;
+    }
+}
+
+BinaryNode<int> *buildTree(vector<int> &arr) {
+    return buildTree(arr, 0, arr.size() - 1);
+}
+
 int main(int argc, char *argv[]) {
-    BinaryNode<int> *root = new BinaryNode<int>(10);
-    root->left = new BinaryNode<int>(5);
-    root->left->parent = root;
-    root->right = new BinaryNode<int>(15);
-    root->right->parent = root;
+    vector<int> arr = {1, 2, 3, 4, 5};
+    BinaryNode<int> *root = buildTree(arr);
     root->subTreeIter();
-
-    // cout << root->subTreeFirst() << " " << root->subTreeLast() << endl;
-    // cout << root->subTreeFirst() << endl;
-    // cout << "successor of root : " << root->successor() << endl;
-    // cout << "predecessor of root : " << root->predecessor() << endl;
-    // cout << root->left->predecessor() << endl;
-
-    auto node = new BinaryNode<int>(1);
-    root->subTreeInsertBefore(node);
-
-    auto node1 = new BinaryNode<int>(2);
-    root->subTreeInsertAfter(node1);
-
-    auto node2 = new BinaryNode<int>(3);
-    root->subTreeInsertBefore(node2);
-    root->left->freeMemorySubtree();
-
-    // root->subTreeDelete();
-    root->subTreeIter();
-
     root->freeMemorySubtree();
-
     return 0;
 }
